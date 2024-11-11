@@ -1,0 +1,37 @@
+from  Crypto.Cipher  import  AES
+import  time
+from  Crypto.Util.Padding  import  pad,  unpad    #  Para  asegurar  que  los  datos  tengan  un  tamaño  múltiplo  de  16  bytes
+
+#  Clave  y  cifrador  en  modo  CBC
+key  =  b'Sixteen  byte  key'
+cipher_encrypt  =  AES.new(key,  AES.MODE_CBC)
+cipher_decrypt  =  AES.new(key,  AES.MODE_CBC,  iv=cipher_encrypt.iv)    #  Usa  el  mismo  IV  para  descifrar
+
+#  Tamaño  del  archivo  en  MB
+file_size_mb  =  10    #  Cambia  a  1,  10,  100,  etc.,  según  el  tamaño  deseado
+
+#  Datos  a  encriptar  y  asegurar  que  el  tamaño  sea  múltiplo  de  16  bytes
+data  =  b'0'  *  (file_size_mb  *  1024  *  1024)    #  Genera  `file_size_mb`  MB  de  datos
+padded_data  =  pad(data,  AES.block_size)
+
+print(f"Encriptando  y  desencriptando  un  archivo  de  {file_size_mb}  MB...")
+
+#  Función  de  encriptación
+def  encrypt(data):
+        return  cipher_encrypt.encrypt(data)
+
+#  Función  de  desencriptación
+def  decrypt(encrypted_data):
+        return  cipher_decrypt.decrypt(encrypted_data)
+
+#  Medir  el  tiempo  de  encriptación
+start_time  =  time.time()
+encrypted  =  encrypt(padded_data)
+end_time  =  time.time()
+print(f"Tiempo  de  encriptación:  {end_time  -  start_time:.6f}  segundos")
+
+#  Medir  el  tiempo  de  desencriptación
+start_time  =  time.time()
+decrypted  =  unpad(decrypt(encrypted),  AES.block_size)
+end_time  =  time.time()
+print(f"Tiempo  de  desencriptación:  {end_time  -  start_time:.6f}  segundos")
