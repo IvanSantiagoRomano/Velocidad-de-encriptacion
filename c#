@@ -1,0 +1,43 @@
+using  System;
+using  System.Diagnostics;
+using  System.IO;
+using  System.Security.Cryptography;
+
+class  Program
+{
+        static  void  Main()
+        {
+                //  Definimos  el  tamaño  del  archivo  en  MB
+                int  fileSizeMB  =  1;  //  Cambiar  a  1  MB
+                byte[]  data  =  new  byte[fileSizeMB  *  1024  *  1024];  //  Crear  datos  de  1  MB
+                new  Random().NextBytes(data);  //  Rellenar  con  datos  aleatorios
+
+                //  Crear  una  clave  y  un  IV  para  AES
+                using  (Aes  aes  =  Aes.Create())
+                {
+                        aes.KeySize  =  128;  //  Usar  AES-128
+                        aes.GenerateKey();  //  Generar  una  clave  aleatoria
+                        aes.GenerateIV();  //  Generar  un  IV  aleatorio
+
+                        //  Medición  de  tiempo  de  encriptación
+                        Stopwatch  stopwatch  =  Stopwatch.StartNew();
+                        byte[]  encryptedData;
+                        using  (var  encryptor  =  aes.CreateEncryptor(aes.Key,  aes.IV))
+                        {
+                                encryptedData  =  encryptor.TransformFinalBlock(data,  0,  data.Length);
+                        }
+                        stopwatch.Stop();
+                        Console.WriteLine($"Tiempo  de  encriptación:  {stopwatch.Elapsed.TotalSeconds}  segundos");
+
+                        //  Medición  de  tiempo  de  desencriptación
+                        stopwatch.Restart();
+                        byte[]  decryptedData;
+                        using  (var  decryptor  =  aes.CreateDecryptor(aes.Key,  aes.IV))
+                        {
+                                decryptedData  =  decryptor.TransformFinalBlock(encryptedData,  0,  encryptedData.Length);
+                        }
+                        stopwatch.Stop();
+                        Console.WriteLine($"Tiempo  de  desencriptación:  {stopwatch.Elapsed.TotalSeconds}  segundos");
+                }
+        }
+}
