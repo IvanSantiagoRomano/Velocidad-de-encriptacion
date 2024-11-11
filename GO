@@ -1,0 +1,33 @@
+package  main
+
+import  (
+        "crypto/aes"
+        "crypto/cipher"
+        "fmt"
+        "time"
+)
+
+func  main()  {
+        fileSizeMB  :=  10
+        data  :=  make([]byte,  fileSizeMB*1024*1024)  //  Datos  de  `fileSizeMB`  MB
+
+        key  :=  []byte("examplekey123456")
+        block,  err  :=  aes.NewCipher(key)
+        if  err  !=  nil  {
+                panic(err)
+        }
+
+        fmt.Printf("Encriptando  y  desencriptando  un  archivo  de  %d  MB...\n",  fileSizeMB)
+
+        //  Medición  de  tiempo  de  encriptación
+        start  :=  time.Now()
+        encrypter  :=  cipher.NewCBCEncrypter(block,  key[:aes.BlockSize])
+        encrypter.CryptBlocks(data,  data)
+        fmt.Printf("Tiempo  de  encriptación:  %v  segundos\n",  time.Since(start).Seconds())
+
+        //  Medición  de  tiempo  de  desencriptación
+        start  =  time.Now()
+        decrypter  :=  cipher.NewCBCDecrypter(block,  key[:aes.BlockSize])
+        decrypter.CryptBlocks(data,  data)
+        fmt.Printf("Tiempo  de  desencriptación:  %v  segundos\n",  time.Since(start).Seconds())
+}
